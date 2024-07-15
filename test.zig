@@ -7,13 +7,13 @@ const NaNBox = @import("NaNBox.zig").NaNBox;
 
 fn nan_check(comptime T: type, value: T) !void {
     const nan = NaNBox.from(T, value);
-    print("nan: {d}\n", .{nan.as(u64)});
+    print("nan: {d}\n", .{nan.as(T)});
 
     if (nan.as(T) != value or @sizeOf(@TypeOf(nan)) != 8) {
-        print("TEST FAILED", .{});
+        print("`TEST FAILED`\n", .{});
         exit(1);
     } else {
-        print("OK", .{});
+        print("`OK`\n", .{});
     }
 }
 
