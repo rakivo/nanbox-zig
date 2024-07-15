@@ -1,5 +1,5 @@
 *.tar.xz
 *.o
-main
+test
 build
 zig-bootstrap-0.13.0
