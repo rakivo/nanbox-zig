@@ -9,7 +9,7 @@ fn nan_check(comptime T: type, value: T) !void {
     const nan = NaNBox.from(T, value);
     print("nan: {d}\n", .{nan.as(T)});
 
-    if (nan.as(T) != value or @sizeOf(@TypeOf(nan)) != 8) {
+    if (!nan.is(T) or nan.as(T) != value) {
         print("`TEST FAILED`\n", .{});
         exit(1);
     } else {

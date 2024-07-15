@@ -11,14 +11,18 @@ pub const NaNBox = union {
 
     const Self = @This();
 
-    const EXP_MASK: u64   = ((1 << 11) - 1) << 52;
-    const TYPE_MASK: u64  = ((1 << 4) - 1) << 48;
+    const EXP_MASK: u64 = ((1 << 11) - 1) << 52;
+    const TYPE_MASK: u64 = ((1 << 4) - 1) << 48;
     const VALUE_MASK: u64 = (1 << 48) - 1;
 
     const SUPPORTED_TYPES_MSG = "Supported types: " ++ @typeName(i64) ++ ", " ++ @typeName(u64) ++ ", " ++ @typeName(f64);
 
     inline fn mkInf() f64 {
         return @bitCast(EXP_MASK);
+    }
+
+    inline fn isNaN(self: Self) bool {
+        return self.v != self.v;
     }
 
     fn setType(x: f64, ty: Type) f64 {
@@ -30,7 +34,8 @@ pub const NaNBox = union {
 
     pub fn getType(self: Self) Type {
         if (!self.isNaN()) return .F64;
-        return comptime @enumFromInt((@as(u64, self.value) & TYPE_MASK) >> 48);
+        const bits: u64 = @bitCast(self.v);
+        return @enumFromInt((bits & TYPE_MASK) >> 48);
     }
 
     fn setValue(x: f64, value: i64) f64 {
@@ -45,16 +50,13 @@ pub const NaNBox = union {
         return if ((bits & (1 << 63)) != 0) -value else value;
     }
 
-    pub inline fn isF64(self: Self) bool {
-        return !self.isNaN();
-    }
-
-    pub inline fn isI64(self: Self) bool {
-        return self.isNaN() and self.getType() == .I64;
-    }
-
-    pub inline fn isU64(self: Self) bool {
-        return self.isNaN() and self.getType() == .U64;
+    pub fn is(self: Self, comptime T: type) bool {
+        return switch (T) {
+            f64  => !self.isNaN(),
+            i64  => self.isNaN() and self.getType() == .I64,
+            u64  => self.isNaN() and self.getType() == .U64,
+            else => @compileError("Unsupported type: " ++ @typeName(T) ++ "\n" ++ SUPPORTED_TYPES_MSG)
+        };
     }
 
     pub fn as(self: Self, comptime T: type) T {
