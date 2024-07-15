@@ -46,7 +46,7 @@ pub const NaNBox = union {
 
     fn getValue(self: Self) i64 {
         const bits: u64 = @bitCast(self.v);
-        const value: i64 = @bitCast(bits & VALUE_MASK);
+        const value: i64 = @intCast(bits & VALUE_MASK);
         return if ((bits & (1 << 63)) != 0) -value else value;
     }
 
@@ -63,7 +63,7 @@ pub const NaNBox = union {
         return switch (T) {
             f64  => self.v,
             i64  => self.getValue(),
-            u64  => @bitCast(self.getValue()),
+            u64  => @intCast(self.getValue()),
             else => @compileError("Unsupported type: " ++ @typeName(T) ++ "\n" ++ SUPPORTED_TYPES_MSG),
         };
     }
