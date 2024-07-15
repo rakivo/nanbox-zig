@@ -21,21 +21,16 @@ pub const NaNBox = union {
         return @bitCast(EXP_MASK);
     }
 
-    fn setType(x: f64, nanboxType: Type) f64 {
+    fn setType(x: f64, ty: Type) f64 {
         var bits: u64 = @bitCast(x);
-        const tv: u64 = @intFromEnum(nanboxType);
+        const tv: u64 = @intFromEnum(ty);
         bits = (bits & ~TYPE_MASK) | ((tv & 0xF) << 48);
         return @bitCast(bits);
     }
 
     pub fn getType(self: Self) Type {
         if (!self.isNaN()) return .F64;
-        return comptime switch ((@as(u64, self.value) & TYPE_MASK) >> 48) {
-            1    => .F64,
-            2    => .I64,
-            3    => .U64,
-            else => @compileError("Unsupported type")
-        };
+        return comptime @enumFromInt((@as(u64, self.value) & TYPE_MASK) >> 48);
     }
 
     fn setValue(x: f64, value: i64) f64 {
