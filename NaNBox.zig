@@ -54,7 +54,7 @@ pub const NaNBox = union {
     }
 
     pub fn getType(self: Self) Type {
-        if (!self.isNaN()) return .F64;
+         if (!self.isNaN()) return .F64;
         const bits: u64 = @bitCast(self.v);
         return @enumFromInt((bits & TYPE_MASK) >> 48);
     }
@@ -73,28 +73,28 @@ pub const NaNBox = union {
 
     pub fn is(self: Self, comptime T: type) bool {
         return switch (T) {
-            f64  => !self.isNaN(),
-            i64  => self.isNaN() and self.getType() == .I64,
-            u64  => self.isNaN() and self.getType() == .U64,
-            else => @compileError("Unsupported type: " ++ @typeName(T) ++ '\n' ++ SUPPORTED_TYPES_MSG)
+            f64 => !self.isNaN(),
+            i64 => self.isNaN() and self.getType() == .I64,
+            u64 => self.isNaN() and self.getType() == .U64,
+            inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ '\n' ++ SUPPORTED_TYPES_MSG)
         };
     }
 
     pub fn as(self: Self, comptime T: type) T {
         return switch (T) {
-            f64  => self.v,
-            i64  => self.getValue(),
-            u64  => @intCast(self.getValue()),
-            else => @compileError("Unsupported type: " ++ @typeName(T) ++ '\n' ++ SUPPORTED_TYPES_MSG),
+            f64 => self.v,
+            i64 => self.getValue(),
+            u64 => @intCast(self.getValue()),
+            inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ '\n' ++ SUPPORTED_TYPES_MSG),
         };
     }
 
     pub fn from(comptime T: type, v: T) Self {
         return switch (T) {
-            f64  => .{ .v = v },
-            u64  => .{ .v = Self.setType(Self.setValue(Self.mkInf(), @as(i64, @intCast(v))), .U64) },
-            i64  => .{ .v = Self.setType(Self.setValue(Self.mkInf(), v), .I64) },
-            else => @compileError("Unsupported type: " ++ @typeName(T) ++ '\n' ++ SUPPORTED_TYPES_MSG),
+            f64 => .{ .v = v },
+            u64 => .{ .v = Self.setType(Self.setValue(Self.mkInf(), @as(i64, @intCast(v))), .U64) },
+            i64 => .{ .v = Self.setType(Self.setValue(Self.mkInf(), v), .I64) },
+            inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ '\n' ++ SUPPORTED_TYPES_MSG),
         };
     }
 };
