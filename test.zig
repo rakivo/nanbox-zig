@@ -7,7 +7,7 @@ const NaNBox = @import("NaNBox.zig").NaNBox;
 
 fn nan_check(comptime T: type, value: T) !void {
     const nan = NaNBox.from(T, value);
-    print("nan: {d}\n", .{nan.as(T)});
+    print("nan: {}\n", .{nan});
 
     if (!nan.is(T) or nan.as(T) != value) {
         print("`TEST FAILED`\n", .{});

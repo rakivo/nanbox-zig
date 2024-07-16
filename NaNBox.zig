@@ -42,7 +42,7 @@ pub const NaNBox = union {
         return @bitCast(EXP_MASK);
     }
 
-    inline fn isNaN(self: Self) bool {
+    inline fn isNaN(self: *const Self) bool {
         return self.v != self.v;
     }
 
@@ -53,7 +53,7 @@ pub const NaNBox = union {
         return @bitCast(bits);
     }
 
-    pub fn getType(self: Self) Type {
+    pub fn getType(self: *const Self) Type {
          if (!self.isNaN()) return .F64;
         const bits: u64 = @bitCast(self.v);
         return @enumFromInt((bits & TYPE_MASK) >> 48);
@@ -65,13 +65,13 @@ pub const NaNBox = union {
         return @bitCast(bits);
     }
 
-    fn getValue(self: Self) i64 {
+    fn getValue(self: *const Self) i64 {
         const bits: u64 = @bitCast(self.v);
         const value: i64 = @intCast(bits & VALUE_MASK);
         return if ((bits & (1 << 63)) != 0) -value else value;
     }
 
-    pub fn is(self: Self, comptime T: type) bool {
+    pub fn is(self: *const Self, comptime T: type) bool {
         return switch (T) {
             f64 => !self.isNaN(),
             i64 => self.isNaN() and self.getType() == .I64,
@@ -80,7 +80,7 @@ pub const NaNBox = union {
         };
     }
 
-    pub fn as(self: Self, comptime T: type) T {
+    pub fn as(self: *const Self, comptime T: type) T {
         return switch (T) {
             f64 => self.v,
             i64 => self.getValue(),
@@ -95,6 +95,14 @@ pub const NaNBox = union {
             u64 => .{ .v = Self.setType(Self.setValue(Self.mkInf(), @as(i64, @intCast(v))), .U64) },
             i64 => .{ .v = Self.setType(Self.setValue(Self.mkInf(), v), .I64) },
             inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ "\n" ++ SUPPORTED_TYPES_MSG),
+        };
+    }
+
+    pub fn format(self: *const Self, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
+        try switch(self.getType()) {
+            .F64 => writer.print("{d}", .{ self.v }),
+            .I64 => writer.print("{d}", .{ self.as(i64) }),
+            .U64 => writer.print("{d}", .{ self.as(u64) }),
         };
     }
 };
