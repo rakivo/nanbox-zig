@@ -76,7 +76,7 @@ pub const NaNBox = union {
             f64 => !self.isNaN(),
             i64 => self.isNaN() and self.getType() == .I64,
             u64 => self.isNaN() and self.getType() == .U64,
-            inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ '\n' ++ SUPPORTED_TYPES_MSG)
+            inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ "\n" ++ SUPPORTED_TYPES_MSG)
         };
     }
 
@@ -85,7 +85,7 @@ pub const NaNBox = union {
             f64 => self.v,
             i64 => self.getValue(),
             u64 => @intCast(self.getValue()),
-            inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ '\n' ++ SUPPORTED_TYPES_MSG),
+            inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ "\n" ++ SUPPORTED_TYPES_MSG),
         };
     }
 
@@ -94,7 +94,7 @@ pub const NaNBox = union {
             f64 => .{ .v = v },
             u64 => .{ .v = Self.setType(Self.setValue(Self.mkInf(), @as(i64, @intCast(v))), .U64) },
             i64 => .{ .v = Self.setType(Self.setValue(Self.mkInf(), v), .I64) },
-            inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ '\n' ++ SUPPORTED_TYPES_MSG),
+            inline else => @compileError("Unsupported type: " ++ @typeName(T) ++ "\n" ++ SUPPORTED_TYPES_MSG),
         };
     }
 };
