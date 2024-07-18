@@ -46,26 +46,26 @@ pub const NaNBox = union {
         return self.v != self.v;
     }
 
-    fn setType(x: f64, ty: Type) f64 {
+    inline fn setType(x: f64, ty: Type) f64 {
         var bits: u64 = @bitCast(x);
         const tv: u64 = @intFromEnum(ty);
         bits = (bits & ~TYPE_MASK) | ((tv & 0xF) << 48);
         return @bitCast(bits);
     }
 
-    pub fn getType(self: *const Self) Type {
+    pub inline fn getType(self: *const Self) Type {
          if (!self.isNaN()) return .F64;
         const bits: u64 = @bitCast(self.v);
         return @enumFromInt((bits & TYPE_MASK) >> 48);
     }
 
-    fn setValue(x: f64, value: i64) f64 {
+    inline fn setValue(x: f64, value: i64) f64 {
         var bits: u64 = @bitCast(x);
         bits = (bits & ~VALUE_MASK) | (@abs(value) & VALUE_MASK) | if (value < 0) @as(u64, 1 << 63) else 0;
         return @bitCast(bits);
     }
 
-    fn getValue(self: *const Self) i64 {
+    inline fn getValue(self: *const Self) i64 {
         const bits: u64 = @bitCast(self.v);
         const value: i64 = @intCast(bits & VALUE_MASK);
         return if ((bits & (1 << 63)) != 0) -value else value;
