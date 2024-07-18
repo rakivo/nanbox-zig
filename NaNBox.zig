@@ -71,7 +71,7 @@ pub const NaNBox = union {
         return if ((bits & (1 << 63)) != 0) -value else value;
     }
 
-    pub fn is(self: *const Self, comptime T: type) bool {
+    pub inline fn is(self: *const Self, comptime T: type) bool {
         return switch (T) {
             f64 => !self.isNaN(),
             i64 => self.isNaN() and self.getType() == .I64,
@@ -80,7 +80,7 @@ pub const NaNBox = union {
         };
     }
 
-    pub fn as(self: *const Self, comptime T: type) T {
+    pub inline fn as(self: *const Self, comptime T: type) T {
         return switch (T) {
             f64 => self.v,
             i64 => self.getValue(),
@@ -89,7 +89,7 @@ pub const NaNBox = union {
         };
     }
 
-    pub fn from(comptime T: type, v: T) Self {
+    pub inline fn from(comptime T: type, v: T) Self {
         return switch (T) {
             f64 => .{ .v = v },
             u64 => .{ .v = Self.setType(Self.setValue(Self.mkInf(), @as(i64, @intCast(v))), .U64) },
